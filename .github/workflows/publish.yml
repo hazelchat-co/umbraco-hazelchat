@@ -1,0 +1,38 @@
+# Publishes Hazelchat.Umbraco to nuget.org when a version tag (v1.2.3) is
+# pushed. nuget.org's trusted publishing swaps this run's GitHub identity
+# for a one-hour key, so no API key is stored anywhere. NUGET_USER (a
+# repository variable) is the nuget.org account that owns the trusted
+# publishing policy. The Umbraco Marketplace lists the package from nuget.org.
+name: Publish to NuGet
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - name: Test
+        run: dotnet test tests/Hazelchat.Umbraco.Tests --nologo
+      - name: Pack
+        run: dotnet pack Hazelchat.Umbraco -c Release -o out --nologo
+      - name: The tag must match the package version
+        run: test -f "out/Hazelchat.Umbraco.${GITHUB_REF_NAME#v}.nupkg"
+      - name: Sign in to nuget.org (trusted publishing)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Push
+        run: dotnet nuget push "out/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json

@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Umbraco 13 and 14 run on .NET 8 (15 and 16 on .NET 9 use the same
+         build); Umbraco 17 and 18 on .NET 10. -->
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- The package compiles against the lowest Umbraco it supports; NuGet's
+         audit then reports that version's old advisories. Sites run their own,
+         patched Umbraco, so these stay warnings. -->
+    <WarningsNotAsErrors>NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <RootNamespace>Hazelchat.Umbraco</RootNamespace>
+
+    <PackageId>Hazelchat.Umbraco</PackageId>
+    <Version>1.0.0</Version>
+    <Title>Hazelchat AI agent</Title>
+    <Authors>Hazelchat</Authors>
+    <Company>Hazelchat</Company>
+    <Copyright>(C) 2026 Hazelchat</Copyright>
+    <Description>Adds your Hazelchat AI agent to every page Umbraco renders, from one setting. It answers visitors from the pages you approved, shows its sources and passes on their enquiries. Umbraco 13 to 18; no template or Program.cs changes.</Description>
+    <PackageTags>umbraco-marketplace umbraco ai chatbot chat agent assistant</PackageTags>
+    <PackageProjectUrl>https://hazelchat.co/integrations/umbraco/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/hazelchat-co/umbraco-hazelchat</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>See CHANGELOG.md in the repository.</PackageReleaseNotes>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="[13.0.0, 17.0.0)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="[17.0.0, 19.0.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="LICENSE" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
