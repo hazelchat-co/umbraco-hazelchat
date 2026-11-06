@@ -32,7 +32,7 @@ Adds your [Hazelchat](https://hazelchat.co/?utm_source=umbraco&utm_medium=packag
 - Every page Umbraco renders from its content gets one tag just before `</body>`:
   `<script src="https://app.hazelchat.co/widget.js" id="hazelchat-umbraco" defer data-agent="<key>"></script>`
 - `InstallationCode` may be the pasted code or just its 64-character key. Anything else, such as an API key, prints nothing and writes one warning to Umbraco's log at startup. The script address is fixed in the code.
-- `RequireConsent` (`false`) adds `data-require-consent="true"`: the chat starts only once your consent manager allows it (Cookiebot, CookieTractor, Usercentrics and others). See [Visitor consent](https://hazelchat.co/integrations/umbraco/#consent).
+- `RequireConsent` (`false`) adds `data-require-consent="true"`: the chat starts only once your consent manager allows it (Cookiebot, CookieTractor, Usercentrics and others). The script file itself still loads straight away; see [Data and third parties](#data-and-third-parties) and [Visitor consent](https://hazelchat.co/integrations/umbraco/#consent).
 - Only `GET` responses with status 200, `text/html` in UTF-8 and no compression, for pages Umbraco routed to published content, are changed. The back office, preview, APIs, media and other files, other controllers' pages and pages without `</body>` stay byte-for-byte as they are. Pages over 4 MB are sent on unchanged.
 - A page that already has the tag, or where the installation code was pasted into a template by hand, gets no second one.
 - Response compression belongs in front of Umbraco (`app.UseResponseCompression()` before `app.UseUmbraco()`, the usual place) or in your web server. If something compresses pages after Umbraco, the chat is not added.
@@ -40,6 +40,8 @@ Adds your [Hazelchat](https://hazelchat.co/?utm_source=umbraco&utm_medium=packag
 ## Data and third parties
 
 - Visitors' browsers load the chat from `app.hazelchat.co` (Hazelchat, Germany). Hazelchat processes the questions they type and, if they leave an enquiry, their name, email address and message ([privacy notice](https://hazelchat.co/privacy/), [terms](https://hazelchat.co/terms/)).
+- With `RequireConsent` on, only the chat waits: browsers still download `widget.js` from `app.hazelchat.co` straight away, so the visitor's IP address reaches Hazelchat before they agree. This is by design. If your site must prevent that too, use a consent tool that can block the script itself.
+- The script tag carries the id `hazelchat-umbraco`. When Hazelchat checks your website, it reads this id to record that the chat was installed with this package, and it counts the package's installations that way.
 - The chat sets no cookies. It keeps a reference to the conversation in session storage until the tab is closed (details on the [cookie banner page](https://hazelchat.co/integrations/cookie-banners/)).
 - The package itself makes no requests from your site, adds no database tables, routes or back-office screens, and stores nothing.
 
@@ -49,7 +51,7 @@ Remove the setting, or the package (`dotnet remove package Hazelchat.Umbraco`), 
 
 ## Deutsch
 
-Hazelchat fügt Ihren KI-Chat-Agenten in jede Seite ein, die Umbraco aus seinen Inhalten rendert (Umbraco 13 bis 18, ohne Template-Änderungen). Fügen Sie das Paket mit `dotnet add package Hazelchat.Umbraco` hinzu, tragen Sie den Installationscode aus Hazelchat in `appsettings.json` unter `Hazelchat:InstallationCode` ein und deployen Sie wie gewohnt. Die Browser Ihrer Besucher laden den Chat von `app.hazelchat.co`; deren Fragen und Anfragedaten verarbeitet Hazelchat. Sie brauchen ein Hazelchat-Konto; der Free-Tarif gilt für eine Website und bleibt kostenlos.
+Hazelchat fügt Ihren KI-Chat-Agenten in jede Seite ein, die Umbraco aus seinen Inhalten rendert (Umbraco 13 bis 18, ohne Template-Änderungen). Fügen Sie das Paket mit `dotnet add package Hazelchat.Umbraco` hinzu, tragen Sie den Installationscode aus Hazelchat in `appsettings.json` unter `Hazelchat:InstallationCode` ein und deployen Sie wie gewohnt. Die Browser Ihrer Besucher laden den Chat von `app.hazelchat.co`; deren Fragen und Anfragedaten verarbeitet Hazelchat. Wartet der Chat auf Ihren Consent-Manager, lädt der Browser `widget.js` trotzdem sofort, und die IP-Adresse des Besuchers erreicht Hazelchat schon vor der Einwilligung; nur der Chat wartet. Über die ID `hazelchat-umbraco` im Skript-Tag zählt Hazelchat die Installationen dieses Pakets. Sie brauchen ein Hazelchat-Konto; der Free-Tarif gilt für eine Website und bleibt kostenlos.
 
 ## Licence
 
